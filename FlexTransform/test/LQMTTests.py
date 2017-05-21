@@ -41,7 +41,7 @@ class TestCFM13AlertToLQMT(unittest.TestCase):
         transform.transform(io.StringIO(CFM13ALERT2), 'cfm13alert', 'lqmtools', target_file=output1_object)
         output1_object.seek(0)
         output1_object.readline()
-        print(output1_object.getvalue())
+        print((output1_object.getvalue()))
 
 
     def test_alert_analyzerid(self):

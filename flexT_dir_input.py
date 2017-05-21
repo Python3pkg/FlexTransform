@@ -37,13 +37,13 @@ if __name__ == '__main__':
                 continue
             iname = os.path.join(root, name)
             oname = os.path.join(output_folder_path, name)
-            print(iname, oname)
+            print((iname, oname))
             with open(iname, "r") as input_file:
                 with open(oname, "w") as output_file:
                     try:
-                        print("Starting processing file: {}".format(iname))
+                        print(("Starting processing file: {}".format(iname)))
                         flexT.TransformFile(input_file, "src", "dst", targetFileName=output_file)
                     except Exception as e:
                         print(e)
-                        print("Exception in found in file, skipping it: {}".format(iname))
+                        print(("Exception in found in file, skipping it: {}".format(iname)))
         break

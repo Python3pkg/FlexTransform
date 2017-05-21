@@ -36,8 +36,8 @@ TESTRUN = 0
 PROFILE = 0
 
 class SchemaOntologyProducer(object):
-    supportsSemanticComponentRelation = rdflib.URIRef(u'{}'.format("http://www.anl.gov/cfm/transform.owl#supportsSemanticComponent"))
-    requiresSemanticComponentRelation = rdflib.URIRef(u'{}'.format("http://www.anl.gov/cfm/transform.owl#requiresSemanticComponent"))
+    supportsSemanticComponentRelation = rdflib.URIRef('{}'.format("http://www.anl.gov/cfm/transform.owl#supportsSemanticComponent"))
+    requiresSemanticComponentRelation = rdflib.URIRef('{}'.format("http://www.anl.gov/cfm/transform.owl#requiresSemanticComponent"))
 
     ''' This class produces an ontology given a JSON schema definition file. '''
     def __init__(self, jsonConfigFile, tboxRDFLibGraph, tboxIRI, schemaIRI):
@@ -59,7 +59,7 @@ class SchemaOntologyProducer(object):
         self.newConcepts = 0
         self.newDescriptions = 0
 
-        self.schemaIRI = rdflib.URIRef(u'{}'.format(schemaIRI))
+        self.schemaIRI = rdflib.URIRef('{}'.format(schemaIRI))
         if (self.schemaIRI,None,None) not in self.graph:
             self.graph.add((self.schemaIRI, rdflib.namespace.RDF.type, rdflib.namespace.RDFS.Class))
             self.graph.add((self.schemaIRI, rdflib.namespace.RDFS.subClassOf, self.namespace.DocumentSchema))
@@ -78,14 +78,14 @@ class SchemaOntologyProducer(object):
         When met, statements will be added to a list of statements to insert into the Tbox and stored as a
         list.
         '''
-        for k in self.jsonConfig.keys():
-            if "fields" in self.jsonConfig[k].keys():
-                for field in self.jsonConfig[k]["fields"].keys():
-                    if "ontologyMappingType" in self.jsonConfig[k]["fields"][field].keys() and \
+        for k in list(self.jsonConfig.keys()):
+            if "fields" in list(self.jsonConfig[k].keys()):
+                for field in list(self.jsonConfig[k]["fields"].keys()):
+                    if "ontologyMappingType" in list(self.jsonConfig[k]["fields"][field].keys()) and \
                        self.jsonConfig[k]["fields"][field]["ontologyMappingType"] != "None":
                         
                         if self.jsonConfig[k]["fields"][field]["ontologyMappingType"] == "simple":
-                            if "ontologyMapping" in self.jsonConfig[k]["fields"][field].keys() and \
+                            if "ontologyMapping" in list(self.jsonConfig[k]["fields"][field].keys()) and \
                                self.jsonConfig[k]["fields"][field]["ontologyMapping"] != "":
                                 ''' In this case, just add the ontology mapping straight in, respecting the required
                                     flag.
@@ -98,8 +98,8 @@ class SchemaOntologyProducer(object):
                             ''' In this case, we need to create a concept in the ontology which is the 'one of' of each enum value. '''
                             # Create a concept which includes all of the enum value concepts
                             eValList = list()
-                            for eVal in self.jsonConfig[k]["fields"][field]["enumValues"].keys():
-                                if "ontologyMapping" in self.jsonConfig[k]["fields"][field]["enumValues"][eVal].keys() and \
+                            for eVal in list(self.jsonConfig[k]["fields"][field]["enumValues"].keys()):
+                                if "ontologyMapping" in list(self.jsonConfig[k]["fields"][field]["enumValues"][eVal].keys()) and \
                                    self.jsonConfig[k]["fields"][field]["enumValues"][eVal]["ontologyMapping"] is not None and \
                                    not self.jsonConfig[k]["fields"][field]["enumValues"][eVal]["ontologyMapping"] == "":
                                     eValList.append(self.jsonConfig[k]["fields"][field]["enumValues"][eVal]["ontologyMapping"])
@@ -114,7 +114,7 @@ class SchemaOntologyProducer(object):
                             ''' In this case, we need to create a concept in the ontology which is the 'one of' for each concept. '''
                             # Create a concept which includes all of the enum value concepts
                             eValList = list()
-                            if "ontologyMappings" in self.jsonConfig[k]["fields"][field].keys() and \
+                            if "ontologyMappings" in list(self.jsonConfig[k]["fields"][field].keys()) and \
                                not len(self.jsonConfig[k]["fields"][field]["ontologyMappings"]) == 0:
                                 for eVal in self.jsonConfig[k]["fields"][field]["ontologyMappings"]:
                                     eValList.append(eVal)
@@ -131,9 +131,9 @@ class SchemaOntologyProducer(object):
         Given a concept IRI, and a snippet of the data associated with the concept to add,
         '''
         # Check to see if the triple is in there
-        iri = rdflib.term.URIRef(u'{}'.format(concept))
+        iri = rdflib.term.URIRef('{}'.format(concept))
         self.graph.add((self.schemaIRI, self.supportsSemanticComponentRelation, iri))
-        if "required" in data.keys() and \
+        if "required" in list(data.keys()) and \
            data["required"] == "true":
             self.graph.add((self.schemaIRI, self.requiresSemanticComponentRelation, iri))
 
@@ -163,7 +163,7 @@ class SchemaOntologyProducer(object):
         self.graph.add((bag, rdflib.namespace.RDF.type, rdflib.namespace.RDF.Bag))
         count = 1
         for eVal in eValList:
-            self.graph.add((bag, rdflib.URIRef(u'http://www.w3.org/1999/02/22-rdf-syntax-ns#_{0}'.format(count)),rdflib.URIRef(eVal)))
+            self.graph.add((bag, rdflib.URIRef('http://www.w3.org/1999/02/22-rdf-syntax-ns#_{0}'.format(count)),rdflib.URIRef(eVal)))
             count += 1
             
         return bag

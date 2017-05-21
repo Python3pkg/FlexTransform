@@ -13,8 +13,8 @@ import traceback
 
 import rdflib
 
-from FlexTransform import FlexTransform
-from FlexTransform.OntologyOracle import Oracle
+from .FlexTransform import FlexTransform
+from .FlexTransform.OntologyOracle import Oracle
 
 
 # Configure logging to send INFO, DEGUB and TRACE messages to stdout and all other logs to stderr

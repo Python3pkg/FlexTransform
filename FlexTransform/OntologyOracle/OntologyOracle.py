@@ -76,7 +76,7 @@ class Oracle(object):
         Will add individuals to support the transformation.
         '''
         # First, add simple mapping types:
-        for category in sourceData.keys():
+        for category in list(sourceData.keys()):
             if isinstance(sourceData[category], dict):
                 dictList = [sourceData[category]]
             else:
@@ -85,8 +85,8 @@ class Oracle(object):
                 for schema_element_name in d:
                     # Look for specific fields now:
                     current_fragment = d[schema_element_name]
-                    if type(current_fragment) == dict and "ontologyMapping" in current_fragment.keys() and \
-                                    "ontologyMappingType" in current_fragment.keys() and \
+                    if type(current_fragment) == dict and "ontologyMapping" in list(current_fragment.keys()) and \
+                                    "ontologyMappingType" in list(current_fragment.keys()) and \
                                     current_fragment["ontologyMappingType"] == "simple":
                         ## Add an individual to the ontology in the given class
                         parentClass = URIRef(current_fragment["ontologyMapping"])
@@ -297,4 +297,4 @@ WHERE {
         return returnValue
        
     def dumpGraph(self):
-        print(self.g.serialize(format="n3"))
+        print((self.g.serialize(format="n3")))

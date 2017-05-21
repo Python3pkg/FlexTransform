@@ -23,10 +23,10 @@ sys.path.insert(1, os.path.join(currentdir,"../../resources/stix.zip"))
 sys.path.insert(2, os.path.join(currentdir,"../../resources/ramrod.zip"))
 
 import ramrod  # @UnresolvedImport
-from stix.core import STIXPackage  # @UnresolvedImport
-from stix.utils import set_id_namespace # @UnresolvedImport
-from stix.utils.parser import UnsupportedVersionError  # @UnresolvedImport
-from stix.utils.idgen import IDGenerator # @UnresolvedImport
+from .stix.core import STIXPackage  # @UnresolvedImport
+from .stix.utils import set_id_namespace # @UnresolvedImport
+from .stix.utils.parser import UnsupportedVersionError  # @UnresolvedImport
+from .stix.utils.idgen import IDGenerator # @UnresolvedImport
 
 # Load special STIX extensions if module is present; used by STIXPackage.from_dict(...) to add header elements
 try:

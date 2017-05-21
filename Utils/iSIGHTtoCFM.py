@@ -9,10 +9,10 @@ from os import environ
 import datetime
 import hashlib
 import hmac
-import httplib
+import http.client
 import subprocess
 import time
-import urllib
+import urllib.request, urllib.parse, urllib.error
 import uuid
 
 from lxml import etree
@@ -52,7 +52,7 @@ class isight(object):
 
     def get_data(self, url, path, query, pub, prv):
         try:
-            from urlparse import urlparse
+            from urllib.parse import urlparse
         except ImportError:
             from urllib.parse import urlparse
         hashed = hmac.new(prv, '', hashlib.sha256)
@@ -62,7 +62,7 @@ class isight(object):
             'X-Auth-Hash': hashed.hexdigest()
         }
         
-        conn = httplib.HTTPSConnection(url)
+        conn = http.client.HTTPSConnection(url)
         conn.request('GET', path + '?' + query, '', headers)
 #         conn.request('GET', "/view/indicators?startDate=1415635200&endDate=1415723057&format=xml", '', headers)
     
@@ -77,7 +77,7 @@ class isight(object):
         Polls iSIGHT's servers for all reports released in the last "minBefore" mintues,
         returns xml formatted list with metadata from Reports
         '''
-        return self.get_data("api.isightpartners.com", self._uriIndicator, urllib.urlencode({'since': self._get_time_from(minBefore), 'format': 'xml'}), self._pubKey, self._privKey)
+        return self.get_data("api.isightpartners.com", self._uriIndicator, urllib.parse.urlencode({'since': self._get_time_from(minBefore), 'format': 'xml'}), self._pubKey, self._privKey)
     
     def get_report_index(self, minBefore):
         '''
@@ -87,7 +87,7 @@ class isight(object):
         Polls iSIGHT's servers for all reports released in the last "minBefore" mintues,
         returns xml formatted list with metadata from Reports
         '''
-        return self.get_data("api.isightpartners.com", self._uriReportIndex, urllib.urlencode({'since': self._get_time_from(minBefore), 'format': 'xml'}), self._pubKey, self._privKey)
+        return self.get_data("api.isightpartners.com", self._uriReportIndex, urllib.parse.urlencode({'since': self._get_time_from(minBefore), 'format': 'xml'}), self._pubKey, self._privKey)
     
     def get_report(self, reportId, reportFormat):
         '''
@@ -96,7 +96,7 @@ class isight(object):
         reportId = iSIGHT report id for requested report
         reportFormat = format for downloaded report: json, xml, STIX, pdf
         '''
-        return self.get_data("api.isightpartners.com", self._uriReportDownload + reportId, urllib.urlencode({'format': reportFormat, 'detail': 'full'}), self.pubKey, self.privKey)
+        return self.get_data("api.isightpartners.com", self._uriReportDownload + reportId, urllib.parse.urlencode({'format': reportFormat, 'detail': 'full'}), self.pubKey, self.privKey)
             
     
 class IndicatorStore(object):
@@ -149,7 +149,7 @@ class IndicatorStore(object):
         output = etree.Element(self._cfm_prefix + "CFMAlert", nsmap=self._nsm, attrib={"{http://www.w3.org/2001/XMLSchema-instance}schemaLocation": "http://www.anl.gov/cfm/2.0/current/CFMAlert CFMAlert.xsd "})
         etree.SubElement(output, self._cfm_prefix + "Version").text = "2.0"
         
-        for report in self._report_dict.values():
+        for report in list(self._report_dict.values()):
             output.append(report.gen_cfm_20_alert())
         return output
 
@@ -159,7 +159,7 @@ class IndicatorStore(object):
         '''
         
         count = 0
-        for report in self._report_dict.itervalues():
+        for report in self._report_dict.values():
             count += report.indicator_count()
         return count
 
@@ -241,7 +241,7 @@ class ReportIndicators(object):
         '''
         
         self._gen_cfm_20_alert_skeleton()
-        [[self._gen_cfm_20_indicator(p[0], v) for v in p[1]] for p in self.indicator_value_dict.items()]
+        [[self._gen_cfm_20_indicator(p[0], v) for v in p[1]] for p in list(self.indicator_value_dict.items())]
         
         return self.report_output
 
@@ -331,7 +331,7 @@ if __name__ == '__main__':
     cfm_config_path = "cfm3/etc/cfm-isight.conf"
     
     try:
-        print "[{0}] Success Start".format(datetime.datetime.utcnow())
+        print("[{0}] Success Start".format(datetime.datetime.utcnow()))
         
         # Download & process iSIGHT data into an indicator store object
         indicator_store = IndicatorStore(isight().get_indicators(time_interval))
@@ -346,8 +346,8 @@ if __name__ == '__main__':
         my_env["PROXY_ALERT"] = "0"
         subprocess.Popen(sys_path + cfm_path + " -f " + sys_path + cfm_config_path + " upload", shell=True, env=my_env)
         
-        print "[{0}] Success Finish {1} Alerts {2} Indicators".format(datetime.datetime.utcnow(), indicator_store.report_count(), indicator_store.indicator_count())
+        print("[{0}] Success Finish {1} Alerts {2} Indicators".format(datetime.datetime.utcnow(), indicator_store.report_count(), indicator_store.indicator_count()))
     except IOError as e:
-        print "[{0}] Success Finish 0 Alerts 0 Indicators".format(datetime.datetime.utcnow())
+        print("[{0}] Success Finish 0 Alerts 0 Indicators".format(datetime.datetime.utcnow()))
     except Exception as e:
-        print "[{0}] Error {1}".format(datetime.datetime.utcnow(), e)
+        print("[{0}] Error {1}".format(datetime.datetime.utcnow(), e))

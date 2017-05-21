@@ -52,7 +52,7 @@ class SchemaParser(object):
                 for z in x["dst_IRIs"]:
                     self.traceindex[z] = x
             if len(self.traceindex) > 0:
-                self.logging.debug("[TRACE __init__] - Monitoring {} elements".format(len(self.traceindex.keys())))
+                self.logging.debug("[TRACE __init__] - Monitoring {} elements".format(len(list(self.traceindex.keys()))))
 
         self.SchemaConfig = config
 
@@ -76,7 +76,7 @@ class SchemaParser(object):
               Essentially this will consist of creating instances of the appropriate subclasses in an ABOX.
         """
         if self.trace and len(self.traceindex) > 0:
-            self.logging.debug("[TRACE MapDataToSchema] - Monitoring {} elements".format(len(self.traceindex.keys())))
+            self.logging.debug("[TRACE MapDataToSchema] - Monitoring {} elements".format(len(list(self.traceindex.keys()))))
 
         # The value map is only used by the _MapRowToSchema function, so it isn't calculated
         # until this method is called and not under __init__()
@@ -155,7 +155,7 @@ class SchemaParser(object):
         Add meta data to the MappedData
         """
         if self.trace and len(self.traceindex) > 0:
-            self.logging.debug("[TRACE MapMetadataToSchema] - Monitoring {} elements".format(len(self.traceindex.keys())))
+            self.logging.debug("[TRACE MapMetadataToSchema] - Monitoring {} elements".format(len(list(self.traceindex.keys()))))
 
         if 'DocumentMetaData' in self.SchemaConfig:
             if isinstance(sourceMetaData, dict):
@@ -176,7 +176,7 @@ class SchemaParser(object):
         """
         self.logging.debug("Begin TransformData(...)")
         if self.trace and len(self.traceindex) > 0:
-            self.logging.debug("[TRACE TransformData] - Monitoring {} elements".format(len(self.traceindex.keys())))
+            self.logging.debug("[TRACE TransformData] - Monitoring {} elements".format(len(list(self.traceindex.keys()))))
         self.transformed_data = {}
 
         # If the oracle is set, initialize it:
@@ -191,9 +191,9 @@ class SchemaParser(object):
         derived_data = None
 
         ''' self.SchemaConfig is the dictionary representation of the destination schema '''
-        if 'IndicatorData' in self.SchemaConfig.keys():
+        if 'IndicatorData' in list(self.SchemaConfig.keys()):
             row_types.append('IndicatorData')
-        if 'DocumentHeaderData' in self.SchemaConfig.keys():
+        if 'DocumentHeaderData' in list(self.SchemaConfig.keys()):
             row_types.append('DocumentHeaderData')
 
         ''' MappedData is the dictionary representation of the source data mapped to the source schema '''
@@ -227,7 +227,7 @@ class SchemaParser(object):
                 else:
                     raise Exception('NoParsableDataFound', "Data isn't in a parsable dictionary format")
             else:
-                print("Row type {} *not* in MappedData".format(rowType))
+                print(("Row type {} *not* in MappedData".format(rowType)))
                 self.transformed_data[rowType] = self._TransformDataToNewSchema(rowType, None, None, document_meta_data,
                                                                                 oracle)
 
@@ -238,14 +238,14 @@ class SchemaParser(object):
         Create a fast lookup dictionary for mapping values from flattened dictionaries back to the schema field
         """
         if self.trace and len(self.traceindex) > 0:
-            self.logging.debug("[TRACE _ValuemapToField] - Monitoring {} elements".format(len(self.traceindex.keys())))
+            self.logging.debug("[TRACE _ValuemapToField] - Monitoring {} elements".format(len(list(self.traceindex.keys()))))
 
         value_map = {}
 
         for rowType in self.SchemaConfig:
             value_map[rowType] = {}
             if 'fields' in self.SchemaConfig[rowType] and isinstance(self.SchemaConfig[rowType]['fields'], dict):
-                for fieldName, fieldDict in self.SchemaConfig[rowType]['fields'].items():
+                for fieldName, fieldDict in list(self.SchemaConfig[rowType]['fields'].items()):
                     if 'valuemap' in fieldDict:
                         value_map[rowType][fieldDict['valuemap']] = fieldName
                         if self.trace and fieldName in self.traceindex:
@@ -266,7 +266,7 @@ class SchemaParser(object):
         Returns a list with the fields in order.
         """
         if self.trace and len(self.traceindex) > 0:
-            self.logging.debug("[TRACE _CalculateSchemaFieldOrder] - Monitoring {} elements".format(len(self.traceindex.keys())))
+            self.logging.debug("[TRACE _CalculateSchemaFieldOrder] - Monitoring {} elements".format(len(list(self.traceindex.keys()))))
 
         # TODO: Can this be cached offline so it is loaded between runs so long as the schema .json files don't change?
         schema_field_order = {}
@@ -276,7 +276,7 @@ class SchemaParser(object):
 
             field_order = {}
 
-            for field, fieldDict in self.SchemaConfig[rowType]['fields'].items():
+            for field, fieldDict in list(self.SchemaConfig[rowType]['fields'].items()):
                 if 'datatype' in fieldDict and fieldDict['datatype'] == "group":
                     # Groups need to be processed last by the transform engine
                     if field not in field_order or field_order[field] < 10:
@@ -319,7 +319,7 @@ class SchemaParser(object):
                             self.logging.debug("[TRACE {}] - no conditions apply; field_order set to {}".format(field, field_order[field]))
 
             # Run through all the fields again and re-order based on references
-            for field, fieldDict in self.SchemaConfig[rowType]['fields'].items():
+            for field, fieldDict in list(self.SchemaConfig[rowType]['fields'].items()):
                 if 'defaultValue' in fieldDict and fieldDict['defaultValue'].startswith('&'):
                     if self.trace and field in self.traceindex:
                         self.logging.debug("[TRACE {}] - defaultValue is a function, evaluating args to see if order needs revision.".format(field))
@@ -445,7 +445,7 @@ class SchemaParser(object):
           * fieldDict - The dictionary of metadata related to the field from the source schema.
         """
         if self.trace and len(self.traceindex) > 0:
-            self.logging.debug("[TRACE _MapRowToSchema] - Monitoring {} elements".format(len(self.traceindex.keys())))
+            self.logging.debug("[TRACE _MapRowToSchema] - Monitoring {} elements".format(len(list(self.traceindex.keys()))))
 
         new_dict = {}
         processed_fields = {}
@@ -582,7 +582,7 @@ class SchemaParser(object):
                                 if self.trace and field in self.traceindex:
                                     self.logging.debug("[TRACE {}] - Processing subRow as flattened dict".format(field))
 
-                                for (subkey, subvalue) in subRow.items():
+                                for (subkey, subvalue) in list(subRow.items()):
                                     if subkey in ValueMap and ValueMap[subkey] not in subfields:
                                         raise Exception('FieldNotAllowed',
                                                         'Field %s is not an allowed subfield of %s' % (
@@ -785,7 +785,7 @@ class SchemaParser(object):
 
         if GroupID:
             # Only rename entries if GroupID is > 0
-            for (k, v) in subDict.items():
+            for (k, v) in list(subDict.items()):
                 if isinstance(v, dict):
                     self._UpdateFieldReferences(v, GroupID, subfields)
                 elif isinstance(v, str):
@@ -826,11 +826,11 @@ class SchemaParser(object):
         bestMatch = None
         bestWeight = 0
 
-        for indicatorType, indicatorMatches in self.SchemaConfig["IndicatorData"]["types"].items():
+        for indicatorType, indicatorMatches in list(self.SchemaConfig["IndicatorData"]["types"].items()):
             for indicatorMatch in indicatorMatches:
                 match = False
                 Weight = 0
-                for k, v in indicatorMatch.items():
+                for k, v in list(indicatorMatch.items()):
                     matchKeys = {}
 
                     if k in newDict and 'Value' in newDict[k]:
@@ -845,7 +845,7 @@ class SchemaParser(object):
 
                     if len(matchKeys) > 0:
                         submatch = False
-                        for key, values in matchKeys.items():
+                        for key, values in list(matchKeys.items()):
                             for value in values:
                                 if v == "*" and value != "":
                                     Weight += 1
@@ -1018,7 +1018,7 @@ class SchemaParser(object):
         '''
         self.logging.debug("_TransformDataToNewSchema(self, rowType={}, ...)".format(rowType))
         if self.trace and len(self.traceindex) > 0:
-            self.logging.debug("[TRACE _TransformDataToNewSchema] - Monitoring {} elements".format(len(self.traceindex.keys())))
+            self.logging.debug("[TRACE _TransformDataToNewSchema] - Monitoring {} elements".format(len(list(self.traceindex.keys()))))
 
 
         # newDict stores the transformed data mapped into the target schema for this row
@@ -1115,11 +1115,11 @@ class SchemaParser(object):
                         if OntologyReference in DataDictionary:
                             # If the semantic value exists exactly in the data dictionary, we can use it
                             # directly; no oracle call is required.
-                            OntologyReferences[OntologyReference].extend(DataDictionary[OntologyReference].keys())
+                            OntologyReferences[OntologyReference].extend(list(DataDictionary[OntologyReference].keys()))
                             if self.trace and field in self.traceindex:
-                                self.logging.debug("[TRACE {}] - Adding DataDictionary[{}].keys() = {}".format(field, OntologyReference, DataDictionary[OntologyReference].keys()))
+                                self.logging.debug("[TRACE {}] - Adding DataDictionary[{}].keys() = {}".format(field, OntologyReference, list(DataDictionary[OntologyReference].keys())))
                             if self.trace and OntologyReference in self.traceindex:
-                                self.logging.debug("[TRACE {}] - Adding for field {} DataDictionary[{}].keys() = {}".format(OntologyReference, field, OntologyReference, DataDictionary[OntologyReference].keys()))
+                                self.logging.debug("[TRACE {}] - Adding for field {} DataDictionary[{}].keys() = {}".format(OntologyReference, field, OntologyReference, list(DataDictionary[OntologyReference].keys())))
                         elif oracle is not None:
                             # If we have a semantic mismatch, check the DataDictionary for ontology references which are
                             # either specializations (prefered) or generalizations of the concept.
@@ -1134,7 +1134,7 @@ class SchemaParser(object):
                                                                         field, altOntologyReference))
                                 if altOntologyReference.IRI.__str__() in DataDictionary:
                                     OntologyReferences[OntologyReference].extend(
-                                        DataDictionary[altOntologyReference.IRI.__str__()].keys())
+                                        list(DataDictionary[altOntologyReference.IRI.__str__()].keys()))
                                     if self.trace and field in self.traceindex:
                                         self.traceindex[field]["dst_IRIs"].append(OntologyReference)
                                         self.logging.debug("[TRACE {}] - Alternate reference found in DataDictionary for {}".format(
@@ -1157,7 +1157,7 @@ class SchemaParser(object):
                                     # If the semantic value exists exactly in the data dictionary, we can use it
                                     # directly; no oracle call is required.
                                     OntologyReferences[OntologyReference].extend(
-                                        DataDictionary[OntologyReference].keys())
+                                        list(DataDictionary[OntologyReference].keys()))
                                     if self.trace and field in self.traceindex:
                                         self.logging.debug("[TRACE {}] - Reference {} found in DataDictionary.".format(
                                                                 field, OntologyReference))
@@ -1176,14 +1176,14 @@ class SchemaParser(object):
                                                     altOntologyReference.stype, altOntologyReference.distance,
                                                     altOntologyReference.IRI, OntologyReference))
                                                 OntologyReferences[OntologyReference].extend(
-                                                    DataDictionary[altOntologyReference.IRI.__str__()].keys())
+                                                    list(DataDictionary[altOntologyReference.IRI.__str__()].keys()))
 
                 elif fieldDict['ontologyMappingType'] == 'enum':
                     # If the destination field type is an enum, we need to determine what value to use for it
                     # based on the source's data values.  An enum ontology mapping type indicates that the value
                     # of the field carries a semantic significance, not just the field itself.
                     if 'enumValues' in fieldDict:
-                        for k, v in fieldDict['enumValues'].items():
+                        for k, v in list(fieldDict['enumValues'].items()):
                             if v['ontologyMapping'] != '':
                                 OntologyReference = v['ontologyMapping']
                                 if self.trace and field in self.traceindex:
@@ -1230,10 +1230,10 @@ class SchemaParser(object):
                                     else:
                                         # If the target file represents this concept as direct value:
                                         OntologyReferences[OntologyReference].extend(
-                                            DataDictionary[OntologyReference].keys())
+                                            list(DataDictionary[OntologyReference].keys()))
                                         if self.trace and field in self.traceindex:
                                             self.logging.debug("[TRACE {}] - Not an enum type, adding {} value references to list for {}.".format(
-                                                                field, len(DataDictionary[OntologyReference].keys()), OntologyReference))
+                                                                field, len(list(DataDictionary[OntologyReference].keys())), OntologyReference))
                                     continue
 
                                 if 'reverseOntologyMappings' in v and isinstance(v['reverseOntologyMappings'], list):
@@ -1339,7 +1339,7 @@ class SchemaParser(object):
 
                             # TODO: If this test fails, no direct map back to source.  Check the ontology for other options
                             if OntologyReference in DataDictionary:
-                                OntologyReferences[OntologyReference].extend(DataDictionary[OntologyReference].keys())
+                                OntologyReferences[OntologyReference].extend(list(DataDictionary[OntologyReference].keys()))
                                 if self.trace and field in self.traceindex:
                                     self.logging.debug("[TRACE {}] - Found ontology reference {} in source Data Dictionary".format(
                                                                 field, OntologyReference))
@@ -1370,7 +1370,7 @@ class SchemaParser(object):
                                                                 field, reverseMapping))
                     if reverseMapping in DataDictionary:
                         OntologyReference = reverseMapping
-                        OntologyReferences[OntologyReference].extend(DataDictionary[OntologyReference].keys())
+                        OntologyReferences[OntologyReference].extend(list(DataDictionary[OntologyReference].keys()))
                         if self.trace and field in self.traceindex:
                             self.logging.debug("[TRACE {}] - Found reverse mapping in data dictionary; using reference {}".format(
                                                                 field, OntologyReference))
@@ -1658,7 +1658,7 @@ class SchemaParser(object):
 
         subfields = self.SchemaConfig[rowType]['fields'][group]['subfields']
         if self.trace and group in self.traceindex:
-            self.logging.debug("[TRACE {}]: Subfield keys are: {}".format(group, ",".join(self.SchemaConfig[rowType]['fields'][group]['subfields'].keys())))
+            self.logging.debug("[TRACE {}]: Subfield keys are: {}".format(group, ",".join(list(self.SchemaConfig[rowType]['fields'][group]['subfields'].keys()))))
 
         # Build the list of required fields for this group
 
@@ -1678,7 +1678,7 @@ class SchemaParser(object):
             defaultFields = self.SchemaConfig[rowType]['fields'][group]['defaultFields']
             if self.trace and group in self.traceindex:
                 self.logging.debug("[TRACE {}] - Processing default fields".format(group))
-            for k, v in defaultFields.items():
+            for k, v in list(defaultFields.items()):
                 if self.trace and k in self.traceindex:
                     self.logging.debug("[TRACE {}] - Processing as one of the default fields for group {}".format(k, group))
                 if k not in groupRow['fields']:
@@ -1738,7 +1738,7 @@ class SchemaParser(object):
         '''
 
         # For each subfield, distribute between primaryKey, required, and other field lists. Also process available values from the full data dictionary:
-        for k, v in subfields.items():
+        for k, v in list(subfields.items()):
             if 'primaryKey' in v and v['primaryKey'] == True:
                 if primaryKey is None:
                     primaryKey = k
@@ -2103,7 +2103,7 @@ class SchemaParser(object):
                             self.logging.debug("[TRACE {}] - Processing as an additionalValueField for group {}".format(field, group))
                         if self.trace and group in self.traceindex:
                             self.logging.debug("[TRACE {}] - Processing additional value field {}.".format(group, field))
-                        for k, v in field.items():
+                        for k, v in list(field.items()):
                             newFieldGroup = copy.deepcopy(fieldGroup)
                             newFieldGroup.pop(k)
                             newFieldGroup[k] = self.SchemaConfig[rowType]['fields'][k].copy()
@@ -2172,7 +2172,7 @@ class SchemaParser(object):
         }
         '''
         if self.trace and len(self.traceindex) > 0:
-            self.logging.debug("[TRACE _MapDataToOntology] - Monitoring {} elements".format(len(self.traceindex.keys())))
+            self.logging.debug("[TRACE _MapDataToOntology] - Monitoring {} elements".format(len(list(self.traceindex.keys()))))
 
         # Result data dictionary
         DataDictionary = {}
@@ -2186,7 +2186,7 @@ class SchemaParser(object):
 
         # Next, add in the document header data
         if DocumentHeaderData is not None:
-            for k, v in DocumentHeaderData.items():
+            for k, v in list(DocumentHeaderData.items()):
                 if self.trace and k in self.traceindex:
                     self.logging.debug("[TRACE {}] - Mapping ontology reference from DocumentHeaderData".format(k))
                 if k in CombinedDataRow:
@@ -2197,7 +2197,7 @@ class SchemaParser(object):
 
         # Check to see if any of the header data is overridden by the document metadata.
         if DocumentMetaData is not None:
-            for k, v in DocumentMetaData.items():
+            for k, v in list(DocumentMetaData.items()):
                 if self.trace and k in self.traceindex:
                     self.logging.debug("[TRACE {}] - Mapping ontology reference from DocumentMetaData".format(k))
                 if k in CombinedDataRow:
@@ -2209,7 +2209,7 @@ class SchemaParser(object):
 
         if DataRow is not None:
             # Check to see if the specific data overrides the document header data or document metadata
-            for k, v in DataRow.items():
+            for k, v in list(DataRow.items()):
                 if self.trace and k in self.traceindex:
                     self.logging.debug("[TRACE {}] - Mapping ontology reference from source DataRow".format(k))
                 if k in CombinedDataRow:
@@ -2218,7 +2218,7 @@ class SchemaParser(object):
                         CombinedDataRow[k], v)
 
             CombinedDataRow.update(DataRow)
-        for field, fieldDict in CombinedDataRow.items():
+        for field, fieldDict in list(CombinedDataRow.items()):
             if 'Value' not in fieldDict:
                 self.logging.warning("Field %s has no value", field)
                 continue
@@ -2611,10 +2611,10 @@ class SchemaParser(object):
         '''
 
         items = []
-        for k, v in NestedDict.items():
+        for k, v in list(NestedDict.items()):
             new_key = ParentKey + Sep + k if ParentKey else k
             if isinstance(v, collections.MutableMapping):
-                items.extend(SchemaParser.FlattenDict(v, new_key).items())
+                items.extend(list(SchemaParser.FlattenDict(v, new_key).items()))
             else:
                 items.append((new_key, v))
         return dict(items)
@@ -2628,7 +2628,7 @@ class SchemaParser(object):
         '''
 
         ud = {}
-        for k, v in FlatDict.items():
+        for k, v in list(FlatDict.items()):
             context = ud
             for sub_key in k.split(Sep)[:-1]:
                 if sub_key not in context:

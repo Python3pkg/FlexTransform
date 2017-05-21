@@ -61,8 +61,8 @@ class CFM13Functions(object):
 
     @classmethod
     def RegisterFunctions(cls):
-        for Scope, Functions in cls.__FunctionNames.items():
-            for FunctionName, RequiredArgs in Functions.items():
+        for Scope, Functions in list(cls.__FunctionNames.items()):
+            for FunctionName, RequiredArgs in list(Functions.items()):
                 TransformFunctionManager.register_function(Scope, FunctionName, RequiredArgs, 'CFM13Functions')
 
     def Execute(self, Scope, FunctionName, args):

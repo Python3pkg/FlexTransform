@@ -45,7 +45,7 @@ class GlobalFunctions(object):
 
     @classmethod
     def register_functions(cls):
-        for FunctionName, RequiredArgs in cls.__FunctionNames.items():
+        for FunctionName, RequiredArgs in list(cls.__FunctionNames.items()):
             ConfigFunctionManager.register_function(FunctionName, RequiredArgs, 'GlobalFunctions')
 
     def Execute(self, function_name, args):

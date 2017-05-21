@@ -35,7 +35,7 @@ class OntologyOracleTests(unittest.TestCase):
         for compList in resList:
             if len(compList) != 3:
                 self.fail("Invalid component list element: %s"%(compList))
-            print("%s\t%s\t%s"%(compList[0],compList[1],compList[2]))
+            print(("%s\t%s\t%s"%(compList[0],compList[1],compList[2])))
         pass
 
     def testAddSemanticComponentIndividual(self):
@@ -50,7 +50,7 @@ class OntologyOracleTests(unittest.TestCase):
         
         ''' Query for individual from graph '''
         myQuery = "SELECT ?s WHERE { ?s <%s> <%s> . }"%(RDF.type, testClass)
-        print("[D] Executing query %s"%(myQuery))
+        print(("[D] Executing query %s"%(myQuery)))
         result = self.myOracle.g.query(myQuery)
         tpass = False
         for row in result:

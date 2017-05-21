@@ -69,7 +69,7 @@ class KVParser(Parser):
                 DataRow = dict(match)
                 
                 if self.QuoteChar:
-                    for k, v in DataRow.items():
+                    for k, v in list(DataRow.items()):
                         DataRow[k] = v.strip(self.QuoteChar.strip("[]"))
                         
                 self.ParsedData['IndicatorData'].append(DataRow)
@@ -132,7 +132,7 @@ class KVParser(Parser):
         toWrite = ""
         for indicator in FinalizedData:
             for row in indicator:
-                for key, value in row.items():
+                for key, value in list(row.items()):
                     if value:
                         toWrite += key + self.KVSeparator.strip("[]") + value + separator
             toWrite = toWrite[:-1]

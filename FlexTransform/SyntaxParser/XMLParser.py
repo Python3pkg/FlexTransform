@@ -166,7 +166,7 @@ class XMLParser(Parser):
         '''
         DataRow = {}
         
-        for k, v in row.items() :
+        for k, v in list(row.items()) :
             if parentValueMap is not None and 'valuemap' in v:
                 v['valuemap'] = v['valuemap'].replace(parentValueMap, '')
             else:
@@ -212,11 +212,11 @@ class XMLParser(Parser):
         if children:
             dd = defaultdict(list)
             for dc in map(XMLParser.etree_to_dict, children):
-                for k, v in iter(dc.items()):
+                for k, v in iter(list(dc.items())):
                     dd[k].append(v)
-            d = {t.tag: {k:v[0] if len(v) == 1 else v for k, v in iter(dd.items())}}
+            d = {t.tag: {k:v[0] if len(v) == 1 else v for k, v in iter(list(dd.items()))}}
         if t.attrib:
-            d[t.tag].update(('@' + k, v) for k, v in t.attrib.iteritems())
+            d[t.tag].update(('@' + k, v) for k, v in t.attrib.items())
         if t.text:
             text = t.text.strip()
             if children or t.attrib:
@@ -231,23 +231,23 @@ class XMLParser(Parser):
         '''
         Based on code from http://stackoverflow.com/questions/7684333/converting-xml-to-dictionary-using-elementtree
         '''
-        basestring = str
+        str = str
         def _to_etree(d, root):
             if not d:
                 pass
-            elif isinstance(d, basestring):
+            elif isinstance(d, str):
                 root.text = d
             elif isinstance(d, list):
                 for i in d :
                     _to_etree(i, node)
             elif isinstance(d, dict):
-                for k,v in d.items():
-                    assert isinstance(k, basestring)
+                for k,v in list(d.items()):
+                    assert isinstance(k, str)
                     if k.startswith('#'):
-                        assert k == '#text' and isinstance(v, basestring)
+                        assert k == '#text' and isinstance(v, str)
                         root.text = v
                     elif k.startswith('@'):
-                        assert isinstance(v, basestring)
+                        assert isinstance(v, str)
                         root.set(k[1:], v)
                     elif isinstance(v, list):
                         n = etree.SubElement(root, k)
@@ -257,7 +257,7 @@ class XMLParser(Parser):
                         _to_etree(v, etree.SubElement(root, k))
             else: assert d == 'invalid type'
         assert isinstance(d, dict) and len(d) == 1
-        tag, body = next(iter(d.items()))
+        tag, body = next(iter(list(d.items())))
         node = etree.Element(tag)
         _to_etree(body, node)
         return node
@@ -287,7 +287,7 @@ class XMLParser(Parser):
         '''
         results = []
         
-        for key, value in Data.items():
+        for key, value in list(Data.items()):
                 row = dict()
                 row[AttributeName] = key
                 row[ValueName] = value

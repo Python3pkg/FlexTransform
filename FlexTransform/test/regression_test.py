@@ -42,7 +42,7 @@ class regression_tests(unittest.TestCase):
         output1_object.seek(0)
         output1_object.readline()
         cls.output1 = etree.parse(output1_object)
-        print(output1_object.getvalue())
+        print((output1_object.getvalue()))
 
     def test_alert_analyzerid(self):
         self.assertEqual(self.output1.xpath("/xmlns:IDMEF-Message/xmlns:Alert/xmlns:Analyzer/@analyzerid", namespaces=self.namespace)[0], "Fake")

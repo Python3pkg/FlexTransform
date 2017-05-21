@@ -226,7 +226,7 @@ class CFM20Alert(object):
                 indicatorIDs[alertID] = []
                 indicatorIDs[alertID].append(row)
                 
-        for rows in indicatorIDs.values():
+        for rows in list(indicatorIDs.values()):
             if rows.__len__() == 1:
                 row = rows[0]
                 indicators = self._BuildIndicators(row.pop('IndicatorSet'))
@@ -326,7 +326,7 @@ class CFM20Alert(object):
         indicatorList = []
         newIndicators = []
         
-        for k,v in indicatorSet.items():
+        for k,v in list(indicatorSet.items()):
             if k == 'Indicator':
                 if isinstance(v,list):
                     indicatorList.extend(v)
@@ -341,7 +341,7 @@ class CFM20Alert(object):
                     newIndicators = self._BuildIndicatorList(v['And'], operation='And')
                     indicatorList.append(newIndicators)
                 else:
-                    raise Exception('InvalidOperation', 'Invalid composite indicator operation: %s' % v.items())
+                    raise Exception('InvalidOperation', 'Invalid composite indicator operation: %s' % list(v.items()))
                 
         if operation == 'And':
             for i in newIndicators:
@@ -383,7 +383,7 @@ class CFM20Alert(object):
         '''
         
         if isinstance(element,dict):
-            for (e, v) in element.items():
+            for (e, v) in list(element.items()):
                 if e in indicator:
                     if isinstance(v,dict):
                         self._NormalizeIndicatorElements(indicator[e], element[e])
@@ -398,7 +398,7 @@ class CFM20Alert(object):
         '''
         
         if isinstance(element,dict):
-            for (e, v) in element.items():
+            for (e, v) in list(element.items()):
                 if isinstance(indicator,dict) and e in indicator:
                     if isinstance(v,dict):
                         self._NormalizeIndicatorNamespaces(indicator[e], element[e])

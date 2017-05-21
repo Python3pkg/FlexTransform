@@ -143,8 +143,8 @@ class Config(object):
         
         # TODO: Validate that the syntax and schema is read only, write only or read/write and throw an error if necessary
     def _validate_schema(self):
-        for outer_key, outer_value in self.SchemaConfig.items():
-            for inner_key, inner_value in outer_value['fields'].items():
+        for outer_key, outer_value in list(self.SchemaConfig.items()):
+            for inner_key, inner_value in list(outer_value['fields'].items()):
                 if 'datatype' not in inner_value or not inner_value['datatype']:
                     raise Exception('RequiredSchemaOptionNotFound', "{}:{}:{}: 'datatype' not found / invalid".format(self.name, outer_key, inner_key))
                 if inner_value['datatype'] == 'datetime' and not ('dateTimeFormat' in inner_value and inner_value['dateTimeFormat']):
@@ -164,7 +164,7 @@ class Config(object):
         if "DerivedData" in self.SchemaParser.SchemaConfig:
             for field in self.SchemaParser.SchemaConfig["DerivedData"]["fields"]:
                 # Call the appropriate function, assuming the required data is available:
-                if field in self.trace_index.keys():
+                if field in list(self.trace_index.keys()):
                     if "ontologyMapping" in self.SchemaParser.SchemaConfig["DerivedData"]["fields"][field] and \
                             not self.SchemaParser.SchemaConfig["DerivedData"]["fields"][field]["ontologyMapping"] is None:
                         self.logging.debug("[TRACE {}]: Found source IRI: {}".format(
@@ -175,7 +175,7 @@ class Config(object):
                         self.logging.debug("[TRACE {}]: No ontologyMapping found".format(field))
                 if "valueFunction" in self.SchemaParser.SchemaConfig["DerivedData"]["fields"][field]:
                     value = self.SchemaParser.SchemaConfig["DerivedData"]["fields"][field]["valueFunction"]
-                    if field in self.trace_index.keys():
+                    if field in list(self.trace_index.keys()):
                         self.logging.debug("[TRACE {}]: Calculating function value {}...".format(field, value))
                     field_name = field
                     field_dict = self.SchemaParser.SchemaConfig["DerivedData"]["fields"][field]
@@ -186,7 +186,7 @@ class Config(object):
                                                            file_name=source_file_name)
                     if value:
                         self.SchemaParser.SchemaConfig["DerivedData"]["fields"][field]["value"] = value
-                    if field in self.trace_index.keys():
+                    if field in list(self.trace_index.keys()):
                         self.logging.debug("[TRACE {}]: Calculated function value = {}".format(field, value))
 
     def _calculate_function_value(self, value, field_name, field_dict, schema_config=None, file_name=None):
@@ -242,7 +242,7 @@ class Config(object):
         '''
         
         # FIXME: This will break if originalDict has a nested dict that is overwritten by a string object in SourceDataRow. This should throw an error.
-        for k, v in SourceDataRow.items():
+        for k, v in list(SourceDataRow.items()):
             if k in originalDict:
                 if isinstance(v,dict):
                     self._MergeDictionaries(originalDict[k],SourceDataRow[k])
@@ -365,7 +365,7 @@ class Config(object):
         # TODO: integrate with Ontology to get default schema configurations for specific ontology objects
         
         for field in schemaConfiguration :
-            fieldtrace = (field in self.trace_index.keys())
+            fieldtrace = (field in list(self.trace_index.keys()))
             fields[field] = {}
             fields[field]["datatype"] = "string"
             fields[field]["required"] = True

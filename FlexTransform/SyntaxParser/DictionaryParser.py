@@ -152,7 +152,7 @@ class DictionaryParser(Parser):
         '''
         DataRow = {}
         
-        for k, v in row.items():
+        for k, v in list(row.items()):
             if k == 'IndicatorType':
                 # Keep passing the IndicatorType forward with the data. This is somewhat messy, but that way we can use it on write
                 pass
